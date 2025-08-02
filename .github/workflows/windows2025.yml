@@ -9,23 +9,36 @@ on:
 jobs:
   test-win2025:
     runs-on: windows-2025
+
     steps:
-      - name: Checkout repo
+      - name: Checkout repository
         uses: actions/checkout@v3
 
-      - name: Show OS info
-        run: |
-          systeminfo
-          echo "Windows Version:"
-          ver
-
-      - name: Run simple PowerShell script
+      - name: Show system information
         shell: pwsh
         run: |
-          Write-Host "Testing Windows Server 2025 runner environment"
-          Get-Process | Sort-Object CPU -Descending | Select-Object -First 5
+          Write-Host "=== System Info ==="
+          systeminfo
 
-      - name: Check installed software
+      - name: Show Windows version (PowerShell)
+        shell: pwsh
         run: |
-          Get-ItemProperty "HKLM:\SOFTWARE\Microsoft\Windows\CurrentVersion\Uninstall\*" | 
-          Select-Object DisplayName, DisplayVersion | Format-Table -AutoSize
+          Write-Host "=== Windows Version (PowerShell) ==="
+          Get-CimInstance Win32_OperatingSystem | Select-Object Caption, Version, BuildNumber
+
+      - name: Show Windows version (CMD)
+        run: cmd /c ver
+
+      - name: List installed programs
+        shell: pwsh
+        run: |
+          Write-Host "=== Installed Programs ==="
+          Get-ItemProperty "HKLM:\SOFTWARE\Microsoft\Windows\CurrentVersion\Uninstall\*" |
+          Select-Object DisplayName, DisplayVersion |
+          Format-Table -AutoSize
+
+      - name: Show running processes (top 10 CPU)
+        shell: pwsh
+        run: |
+          Write-Host "=== Top 10 Processes by CPU Usage ==="
+          Get-Process | Sort-Object CPU -Descending | Select-Object -First 10 | Format-Table -AutoSize

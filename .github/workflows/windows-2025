@@ -1,0 +1,31 @@
+name: Test on Windows Server 2025
+
+on:
+  push:
+    branches:
+      - main
+  workflow_dispatch:
+
+jobs:
+  test-win2025:
+    runs-on: windows-2025
+    steps:
+      - name: Checkout repo
+        uses: actions/checkout@v3
+
+      - name: Show OS info
+        run: |
+          systeminfo
+          echo "Windows Version:"
+          ver
+
+      - name: Run simple PowerShell script
+        shell: pwsh
+        run: |
+          Write-Host "Testing Windows Server 2025 runner environment"
+          Get-Process | Sort-Object CPU -Descending | Select-Object -First 5
+
+      - name: Check installed software
+        run: |
+          Get-ItemProperty "HKLM:\SOFTWARE\Microsoft\Windows\CurrentVersion\Uninstall\*" | 
+          Select-Object DisplayName, DisplayVersion | Format-Table -AutoSize
